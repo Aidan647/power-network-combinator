@@ -1,0 +1,10 @@
+{
+	"name": "power-network-combinator",
+	"version": "0.0.1",
+	"title": "Power Network Combinator",
+	"author": "Aidan647",
+	"homepage": "https://github.com/Aidan647/power-network-combinator",
+	"description": "",
+	"factorio_version": "2.1",
+	"dependencies": ["base"]
+}
