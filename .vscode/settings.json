@@ -1,5 +1,18 @@
 {
+	"Lua.runtime.version": "Lua 5.2",
+	"Lua.workspace.library": [
+		"~/Downloads/factorio/2.1.12/data/core/",
+		"~/Downloads/factorio/2.1.12/data/core/lualib",
+		"~/Downloads/factorio/2.1.12/data/core/prototypes",
+		"~/Downloads/factorio/2.1.12/data/base/prototypes"
+	],
+	"Lua.workspace.checkThirdParty": false,
 	"Lua.diagnostics.globals": [
-		"data"
+		"data",
+		"game",
+		"script",
+		"defines",
+		"log",
+		"storage"
 	]
 }
