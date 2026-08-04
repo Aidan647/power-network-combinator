@@ -1,12 +1,13 @@
 {
 	"Lua.runtime.version": "Lua 5.2",
 	"Lua.workspace.library": [
+		"/home/aidan647/Downloads/factorio/2.1.12/mods/flib/",
 		"~/Downloads/factorio/2.1.12/data/core/",
 		"~/Downloads/factorio/2.1.12/data/core/lualib",
 		"~/Downloads/factorio/2.1.12/data/core/prototypes",
 		"~/Downloads/factorio/2.1.12/data/base/prototypes"
 	],
-	"Lua.workspace.checkThirdParty": false,
+	"Lua.workspace.checkThirdParty": "ApplyInMemory",
 	"Lua.diagnostics.globals": [
 		"data",
 		"game",
@@ -14,5 +15,14 @@
 		"defines",
 		"log",
 		"storage"
+	],
+	"factorio.versions": [
+		{
+			"name": "2.1",
+			"factorioPath": "/home/aidan647/Downloads/factorio/2.1.12/bin/x64/factorio"
+		}
+	],
+	"Lua.workspace.userThirdParty": [
+		"/home/aidan647/.config/Code/User/workspaceStorage/43f7273b7c522f9241aedbbf12f82d31/justarandomgeek.factoriomod-debug/sumneko-3rd"
 	]
 }
