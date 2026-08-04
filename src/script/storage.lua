@@ -30,6 +30,7 @@ end
 --- Unregister a pair.
 ---@param entry CombinatorEntry
 function storage_mod.remove(entry)
+	if not entry then return end
 	storage.combinators[entry.combinator_unit] = nil
 	storage.combinators[entry.sensor_unit] = nil
 end

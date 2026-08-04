@@ -50,30 +50,54 @@ function network.convert_flow(flow, multiplier_index)
 	}
 end
 
+---
+---@param filter LogisticFilter
+---@param flow LuaElectricNetwork.flow_last_tick | nil
+---@param multiplier_index integer
+---@return LogisticFilter|nil
+local function set_filter(filter, flow, multiplier_index)
+	if filter.value.type ~= "virtual" and filter.value.quality ~= "normal" then return end
+	local name = filter.value.name
+	local mapping = constants.find_on_signal(name)
+	if not mapping then return end
+	if flow == nil then
+		filter.min = 0
+		return
+	end
+	local value = flow[mapping[2]]
+	log("PNC: setting filter for " .. name .. " to " .. value .. "multiplier_index: " .. multiplier_index)
+	if mapping[3] then
+		value = value * 1000
+	else
+		local multiplier = constants.multiplier_options[multiplier_index].multiplier
+		value = math.floor(value * 60 / multiplier)
+	end
+	value = math.max(value, 0)
+	value = math.min(value, 2 ^ 31 - 1)
+	filter.min = value
+	return filter
+end
+
+
 --- Write converted values into the combinator's circuit slots.
 ---@param combinator LuaEntity
----@param values DisplayValues|nil
-local function set_values(combinator, values)
+---@param flow LuaElectricNetwork.flow_last_tick | nil
+---@param multiplier_index integer | nil
+local function set_values(combinator, flow, multiplier_index)
 	local control = combinator.get_or_create_control_behavior()
 	---@cast control LuaConstantCombinatorControlBehavior|nil
 	if not control or control.object_name ~= "LuaConstantCombinatorControlBehavior" then return end
+	multiplier_index = multiplier_index or constants.DEFAULT_MULTIPLIER_INDEX
 
-	local section = control.get_section(1)
-	if not section then section = control.add_section() end
-	if not section then return end
-
-	control.enabled = true
-
-	for i, mapping in ipairs(constants.signal_map) do
-		local signal_name, field = mapping[1], mapping[2]
-		local min_val = 0
-		if values and values[field] then
-			min_val = values[field]
+	for _, section in ipairs(control.sections) do
+		if section.group == "" and section.is_manual == true then
+			for i, filter in pairs(section.filters) do
+				local f = set_filter(filter, flow, multiplier_index)
+				if f then
+					section.set_slot(i, f)
+				end
+			end
 		end
-		section.set_slot(i, {
-			value = { type = "virtual", name = signal_name, quality = "normal" },
-			min = min_val,
-		})
 	end
 end
 
@@ -93,14 +117,14 @@ local function on_tick()
 				pairs_mod.destroy(entry)
 			elseif sensor.is_connected_to_electric_network() then
 				local flow = sensor.electric_network.parent_network.flow_last_tick
-				set_values(combinator, network.convert_flow(flow, entry.multiplier_index))
+				set_values(combinator, flow, entry.multiplier_index)
 			else
-				set_values(combinator, nil)
+				set_values(combinator, nil, entry.multiplier_index)
 			end
 		end
 	end
 end
 
-script.on_nth_tick(10, on_tick)
+script.on_nth_tick(6, on_tick)
 
 return network

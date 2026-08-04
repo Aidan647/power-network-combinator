@@ -8,6 +8,7 @@ local constants = {}
 ---@class SignalMapping
 ---@field [1] string Circuit signal name
 ---@field [2] string flow_last_tick field name
+---@field [3] boolean|nil is percentage boolean (optional) Whether the value is a percentage (0-1) and should be scaled to 0-1000
 
 -- Entity names
 constants.COMBINATOR_NAME = "power-network-combinator"
@@ -49,13 +50,26 @@ constants.multiplier_options = {
 constants.signal_map = {
 	{ "signal-P", "maximum_production" },
 	{ "signal-C", "maximum_consumption" },
-	{ "signal-S", "production_satisfaction" },
+	{ "signal-S", "production_satisfaction",  true },
 	{ "signal-A", "accumulator_energy" },
 	{ "signal-B", "accumulator_capacity" },
 	{ "signal-T", "total_transfer" },
 	{ "signal-D", "solar_output" },
-	{ "signal-U", "consumption_satisfaction" },
+	{ "signal-U", "consumption_satisfaction", true },
 }
+local cache = {}
+
+---@param signal string
+---@return SignalMapping|nil
+constants.find_on_signal = function(signal)
+	if cache[signal] then return cache[signal] end
+	for _, mapping in ipairs(constants.signal_map) do
+		if mapping[1] == signal then
+			cache[signal] = mapping
+			return mapping
+		end
+	end
+end
 
 -- Short description shown in the combinator tooltip, one line per signal.
 constants.combinator_description = table.concat({
