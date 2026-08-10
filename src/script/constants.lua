@@ -17,6 +17,21 @@ constants.SENSOR_NAME = "power-network-combinator-sensor"
 -- Default unit scale index into multiplier_options (kW / kJ)
 constants.DEFAULT_MULTIPLIER_INDEX = 2
 
+-- Default satisfaction scale (0-1 fraction multiplied by this to get the output signal)
+constants.DEFAULT_SATISFACTION_SCALE_INDEX = 1
+
+-- Default number of combinators updated per tick.
+constants.DEFAULT_UPDATES_PER_TICK = 100
+
+
+-- Preset satisfaction scales shown in the dropdown.
+---@type {value: integer, label: any}[]
+constants.satisfaction_options = {
+	{ value = 100, label = "100 (%)" },
+	{ value = 1000, label = "1000 (‰)" },
+	{ value = 1e6, label = { "", "1", { "si-prefix-symbol-mega" } } },
+}
+
 -- Compose a unit label from base-game SI prefix + unit symbols.
 -- e.g. prefix "kilo" + watt/joule -> "kW / kJ"
 ---@param prefix string Base-game si-prefix-symbol-* key suffix ("" for none)

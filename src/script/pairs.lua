@@ -3,6 +3,23 @@ local util = require("script.util")
 local storage_mod = require("script.storage")
 
 local pairs_mod = {}
+--- @param entity LuaEntity
+local function init_combinator(entity)
+	entity.combinator_description = constants.combinator_description
+	local control = entity.get_or_create_control_behavior()
+	--- @cast control LuaConstantCombinatorControlBehavior|nil
+	if not control or control.object_name ~= "LuaConstantCombinatorControlBehavior" then return end
+	for _, section in pairs(control.sections) do
+		if section.group == "" then
+			for i, signal in ipairs(constants.signal_map) do
+				--- @type LogisticFilter
+				local s = { value = { name = signal[1], type = "virtual", quality = "normal" }, min = 0 }
+				section.set_slot(i, s)
+			end
+			break
+		end
+	end
+end
 
 --- Create a hidden sensor next to a placed combinator and register the pair.
 ---@param entity LuaEntity
@@ -25,18 +42,17 @@ function pairs_mod.create(entity)
 	sensor.destructible = false
 	sensor.minable_flag = false
 	sensor.operable = false
-	entity.combinator_description = constants.combinator_description
-
+	init_combinator(entity)
 	local entry = {
 		combinator = entity,
 		sensor = sensor,
 		combinator_unit = entity.unit_number,
 		sensor_unit = sensor.unit_number,
 		multiplier_index = constants.DEFAULT_MULTIPLIER_INDEX,
+		satisfaction_index = constants.DEFAULT_SATISFACTION_SCALE_INDEX,
 	}
 	storage_mod.add(entry)
 
-	util.log("PNC: placed")
 end
 
 --- Remove a pair from storage and destroy both entities.

@@ -4,8 +4,9 @@ local storage_mod = require("script.storage")
 local gui = {}
 
 local FRAME_NAME = "pnc-frame"
-local DROPDOWN_NAME = "pnc-dropdown"
+local STEP_DROPDOWN_NAME = "pnc-step-dropdown"
 local LABEL_NAME = "pnc-label"
+local SATISFACTION_DROPDOWN_NAME = "pnc-satisfaction-dropdown"
 local RELATIVE_GUI = defines.relative_gui_type.constant_combinator_gui
 local RELATIVE_POSITION = defines.relative_gui_position.right
 
@@ -40,6 +41,19 @@ for _, opt in ipairs(constants.multiplier_options) do
 	table.insert(scale_selector_items, opt.label)
 end
 
+--- @type string[]
+local satisfaction_selector_items = {}
+for _, opt in ipairs(constants.satisfaction_options) do
+	table.insert(satisfaction_selector_items, opt.label)
+end
+
+--- Find the dropdown index for a satisfaction scale, defaulting to the default option.
+---@param value integer|nil
+---@return integer
+local function satisfaction_index(value)
+	return value or constants.DEFAULT_SATISFACTION_SCALE_INDEX
+end
+
 --- Build the scale dropdown, anchored to the combinator GUI.
 ---@param player LuaPlayer
 ---@param entry CombinatorEntry
@@ -57,7 +71,7 @@ local function build_scale_frame(player, entry)
 	local idx = entry.multiplier_index or constants.DEFAULT_MULTIPLIER_INDEX
 	frame.add {
 		type = "drop-down",
-		name = DROPDOWN_NAME,
+		name = STEP_DROPDOWN_NAME,
 		items = scale_selector_items,
 		selected_index = idx
 	}
@@ -66,6 +80,19 @@ local function build_scale_frame(player, entry)
 		caption = constants.multiplier_options[idx].range_label,
 		name = LABEL_NAME,
 		style = "bold_label"
+	}
+	frame.add {
+		type = "line"
+	}
+	frame.add {
+		type = "label",
+		caption = "Satisfaction scale",
+	}
+	frame.add {
+		type = "drop-down",
+		name = SATISFACTION_DROPDOWN_NAME,
+		items = satisfaction_selector_items,
+		selected_index = satisfaction_index(entry.satisfaction_index),
 	}
 end
 
@@ -91,9 +118,14 @@ local function on_gui_closed(event)
 	end
 end
 
+--- Handle a selection change in either of our dropdowns, persisting the chosen
+--- value and updating the range label for the step dropdown.
 local function on_gui_selection_changed(event)
 	local element = event.element
-	if not (element and element.valid) or element.name ~= DROPDOWN_NAME then return end
+	if not (element and element.valid) then return end
+	local is_step = element.name == STEP_DROPDOWN_NAME
+	local is_satisfaction = element.name == SATISFACTION_DROPDOWN_NAME
+	if not (is_step or is_satisfaction) then return end
 
 	local player = game.get_player(event.player_index)
 	if not player then return end
@@ -105,15 +137,19 @@ local function on_gui_selection_changed(event)
 	local entry = storage_mod.get(entity.unit_number)
 	if not entry then return end
 
-	entry.multiplier_index = element.selected_index
+	if is_step then
+		entry.multiplier_index = element.selected_index
 
-	-- Update the range label
-	local label = player.gui.relative[FRAME_NAME]
-	if label then
-		label = label[LABEL_NAME]
+		-- Update the range label
+		local label = player.gui.relative[FRAME_NAME]
 		if label then
-			label.caption = constants.multiplier_options[element.selected_index].range_label
+			label = label[LABEL_NAME]
+			if label then
+				label.caption = constants.multiplier_options[element.selected_index].range_label
+			end
 		end
+	else
+		entry.satisfaction_index = element.selected_index
 	end
 end
 
