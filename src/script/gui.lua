@@ -1,7 +1,6 @@
 local constants = require("script.constants")
 local storage_mod = require("script.storage")
 
-local gui = {}
 
 local FRAME_NAME = "pnc-frame"
 local STEP_DROPDOWN_NAME = "pnc-step-dropdown"
@@ -156,5 +155,3 @@ end
 script.on_event(defines.events.on_gui_opened, on_gui_opened)
 script.on_event(defines.events.on_gui_closed, on_gui_closed)
 script.on_event(defines.events.on_gui_selection_state_changed, on_gui_selection_changed)
-
-return gui

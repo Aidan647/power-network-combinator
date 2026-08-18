@@ -2,7 +2,6 @@ local constants = require("script.constants")
 local storage_mod = require("script.storage")
 local pairs_mod = require("script.pairs")
 
-local network = {}
 
 ---@class FlowLastTick
 ---@field maximum_production number
@@ -31,6 +30,7 @@ local function set_filter(filter, flow, multiplier_index, satisfaction_scale)
 		return filter
 	end
 	local value = flow[mapping[2]]
+	--if persetnage (0 - 1) then multiply by satisfaction scale
 	if mapping[3] then
 		value = value * satisfaction_scale
 		-- If the filter's min is already equal to the value, we don't need to update it.
@@ -113,5 +113,3 @@ local function on_tick(event)
 end
 
 script.on_event(defines.events.on_tick, on_tick)
-
-return network

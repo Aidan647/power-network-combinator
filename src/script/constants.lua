@@ -25,47 +25,45 @@ constants.DEFAULT_UPDATES_PER_TICK = 100
 
 
 -- Preset satisfaction scales shown in the dropdown.
----@type {value: integer, label: any}[]
+---@type {value: integer, label: LocalisedString}[]
 constants.satisfaction_options = {
 	{ value = 100, label = "100 (%)" },
 	{ value = 1000, label = "1000 (‰)" },
 	{ value = 1e6, label = { "", "1", { "si-prefix-symbol-mega" } } },
 }
 
--- Compose a unit label from base-game SI prefix + unit symbols.
--- e.g. prefix "kilo" + watt/joule -> "kW / kJ"
----@param prefix string Base-game si-prefix-symbol-* key suffix ("" for none)
+constants.prefixes = { "", "kilo", "mega", "giga", "tera", "peta", "exa", "zetta", "yotta", "quetta" }
+
+
+---@param index integer
 ---@return LocalisedString
-local function unit_label(prefix)
+local function unit_label(index)
+	local prefix = constants.prefixes[index] or ""
 	local p = prefix ~= "" and { "si-prefix-symbol-" .. prefix } or ""
 	return { "", p, { "si-unit-symbol-watt" }, " / ", p, { "si-unit-symbol-joule" } }
 end
 
--- Compose a range label showing the max representable value: "2.1 GW", "2.1 TW", etc.
----@param prefix string Current scale prefix ("" for W)
----@return LocalisedString
-local function make_range_label(prefix)
-	return { "", "Up to 2.1 ", unit_label(prefix) }
-end
 
+local function entry(index)
+	return {
+		multiplier = (1000 ^ (index - 1)),
+		label = unit_label(index),
+		range_label = { "", { "pnc-locale.up-to-2-1" }, " ", unit_label(index + 3) }
+	}
+end
 -- Unit scales: divisor applied to power/energy output values.
 ---@type MultiplierOption[]
-constants.multiplier_options = {
-	{ multiplier = 1e0,  label = unit_label(""),     range_label = make_range_label("giga") },
-	{ multiplier = 1e3,  label = unit_label("kilo"), range_label = make_range_label("tera") },
-	{ multiplier = 1e6,  label = unit_label("mega"), range_label = make_range_label("peta") },
-	{ multiplier = 1e9,  label = unit_label("giga"), range_label = make_range_label("exa") },
-	{ multiplier = 1e12, label = unit_label("tera"), range_label = make_range_label("zetta") },
-	{ multiplier = 1e15, label = unit_label("peta"), range_label = make_range_label("yotta") },
-	{ multiplier = 1e18, label = unit_label("exa"),  range_label = make_range_label("quetta") },
-}
-
+constants.multiplier_options = {}
+for i = 1, 7 do
+	constants.multiplier_options[i] = entry(i)
+end
 -- Circuit signal mapping: slot index -> { signal name, flow field }
 ---@type SignalMapping[]
 constants.signal_map = {
 	{ "signal-P", "maximum_production" },
 	{ "signal-C", "maximum_consumption" },
 	{ "signal-S", "production_satisfaction",  true },
+	-- TODO: not multiplied by
 	{ "signal-A", "accumulator_energy" },
 	{ "signal-B", "accumulator_capacity" },
 	{ "signal-T", "total_transfer" },
@@ -90,12 +88,12 @@ end
 constants.combinator_description = table.concat({
 	"[virtual-signal=signal-P]: Maximum production",
 	"[virtual-signal=signal-C]: Maximum consumption",
-	"[virtual-signal=signal-S]: Production satisfaction (0-1000)",
+	"[virtual-signal=signal-S]: Production satisfaction",
 	"[virtual-signal=signal-A]: Accumulator energy",
 	"[virtual-signal=signal-B]: Accumulator capacity",
 	"[virtual-signal=signal-T]: Total transfer",
 	"[virtual-signal=signal-D]: Solar output",
-	"[virtual-signal=signal-U]: Consumption satisfaction (0-1000)",
+	"[virtual-signal=signal-U]: Consumption satisfaction",
 }, "\n")
 
 return constants

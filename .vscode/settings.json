@@ -20,6 +20,10 @@
 		{
 			"name": "2.1",
 			"factorioPath": "/home/aidan647/Downloads/factorio/2.1.12/bin/x64/factorio"
+		},
+		{
+			"name": "14",
+			"factorioPath": "/home/aidan647/Downloads/factorio/2.1.14/bin/x64/factorio"
 		}
 	],
 	"Lua.workspace.userThirdParty": [
