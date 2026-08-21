@@ -5,10 +5,15 @@ local constants = {}
 ---@field label LocalisedString Display label
 ---@field range_label LocalisedString Max representable value (e.g. "2.1 GW")
 
+---@alias SignalKind "usage" | "percentage" | "capacity"
+
 ---@class SignalMapping
 ---@field [1] string Circuit signal name
 ---@field [2] string flow_last_tick field name
----@field [3] boolean|nil is percentage boolean (optional) Whether the value is a percentage (0-1) and should be scaled to 0-1000
+---@field [3] SignalKind How the raw flow value is converted:
+---  "usage"     - power/energy rate, multiplied by 60 and divided by the unit multiplier
+---  "percentage" - fraction (0-1), multiplied by the satisfaction scale
+---  "capacity"  - absolute value, used as-is
 
 -- Entity names
 constants.COMBINATOR_NAME = "power-network-combinator"
@@ -29,6 +34,8 @@ constants.DEFAULT_UPDATES_PER_TICK = 100
 constants.satisfaction_options = {
 	{ value = 100, label = "100 (%)" },
 	{ value = 1000, label = "1000 (‰)" },
+	-- The language server misresolves the nested LocalisedString here.
+	---@diagnostic disable-next-line: assign-type-mismatch, missing-fields
 	{ value = 1e6, label = { "", "1", { "si-prefix-symbol-mega" } } },
 }
 
@@ -60,15 +67,14 @@ end
 -- Circuit signal mapping: slot index -> { signal name, flow field }
 ---@type SignalMapping[]
 constants.signal_map = {
-	{ "signal-P", "maximum_production" },
-	{ "signal-C", "maximum_consumption" },
-	{ "signal-S", "production_satisfaction",  true },
-	-- TODO: not multiplied by
-	{ "signal-A", "accumulator_energy" },
-	{ "signal-B", "accumulator_capacity" },
-	{ "signal-T", "total_transfer" },
-	{ "signal-D", "solar_output" },
-	{ "signal-U", "consumption_satisfaction", true },
+	{ "signal-P", "maximum_production", "usage" },
+	{ "signal-C", "maximum_consumption", "usage" },
+	{ "signal-S", "production_satisfaction", "percentage" },
+	{ "signal-A", "accumulator_energy", "capacity" },
+	{ "signal-B", "accumulator_capacity", "capacity" },
+	{ "signal-T", "total_transfer", "usage" },
+	{ "signal-D", "solar_output", "usage" },
+	{ "signal-U", "consumption_satisfaction", "percentage" },
 }
 local cache = {}
 

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.1.0
+Date: 21. 08. 2026
+  Major Features:
+    - Initial release of Power Network Combinator.
+  Features:
+    - Adds a combinator that outputs power network statistics as circuit signals.

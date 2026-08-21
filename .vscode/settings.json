@@ -1,11 +1,10 @@
 {
 	"Lua.runtime.version": "Lua 5.2",
 	"Lua.workspace.library": [
-		"/home/aidan647/Downloads/factorio/2.1.12/mods/flib/",
-		"~/Downloads/factorio/2.1.12/data/core/",
-		"~/Downloads/factorio/2.1.12/data/core/lualib",
-		"~/Downloads/factorio/2.1.12/data/core/prototypes",
-		"~/Downloads/factorio/2.1.12/data/base/prototypes"
+		"~/Downloads/factorio/2.1.14/data/core/",
+		"~/Downloads/factorio/2.1.14/data/core/lualib",
+		"~/Downloads/factorio/2.1.14/data/core/prototypes",
+		"~/Downloads/factorio/2.1.14/data/base/prototypes"
 	],
 	"Lua.workspace.checkThirdParty": "ApplyInMemory",
 	"Lua.diagnostics.globals": [
@@ -17,10 +16,6 @@
 		"storage"
 	],
 	"factorio.versions": [
-		{
-			"name": "2.1",
-			"factorioPath": "/home/aidan647/Downloads/factorio/2.1.12/bin/x64/factorio"
-		},
 		{
 			"name": "14",
 			"factorioPath": "/home/aidan647/Downloads/factorio/2.1.14/bin/x64/factorio"

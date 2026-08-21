@@ -60,7 +60,7 @@ local function build_scale_frame(player, entry)
 	local frame = player.gui.relative.add {
 		type = "frame",
 		name = FRAME_NAME,
-		caption = "Step",
+		caption = { "pnc-locale.gui-unit-scale" },
 		direction = "vertical",
 		anchor = {
 			gui = RELATIVE_GUI,
@@ -85,7 +85,7 @@ local function build_scale_frame(player, entry)
 	}
 	frame.add {
 		type = "label",
-		caption = "Satisfaction scale",
+		caption = { "pnc-locale.gui-satisfaction-output-maximum" },
 	}
 	frame.add {
 		type = "drop-down",
@@ -135,20 +135,20 @@ local function on_gui_selection_changed(event)
 
 	local entry = storage_mod.get(entity.unit_number)
 	if not entry then return end
-
+	local selected_index = element.selected_index or 1
 	if is_step then
-		entry.multiplier_index = element.selected_index
+		entry.multiplier_index = selected_index
 
 		-- Update the range label
 		local label = player.gui.relative[FRAME_NAME]
 		if label then
 			label = label[LABEL_NAME]
 			if label then
-				label.caption = constants.multiplier_options[element.selected_index].range_label
+				label.caption = constants.multiplier_options[selected_index].range_label
 			end
 		end
 	else
-		entry.satisfaction_index = element.selected_index
+		entry.satisfaction_index = selected_index
 	end
 end
 

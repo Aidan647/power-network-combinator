@@ -1,6 +1,7 @@
 local constants = require("script.constants")
 local storage_mod = require("script.storage")
 local pairs_mod = require("script.pairs")
+local util = require("script.util")
 
 
 ---@class FlowLastTick
@@ -30,19 +31,22 @@ local function set_filter(filter, flow, multiplier_index, satisfaction_scale)
 		return filter
 	end
 	local value = flow[mapping[2]]
-	--if persetnage (0 - 1) then multiply by satisfaction scale
-	if mapping[3] then
-		value = value * satisfaction_scale
-		-- If the filter's min is already equal to the value, we don't need to update it.
-		if value == filter.min then
-			return
-		end
-	else
+	local kind = mapping[3]
+	if kind == "percentage" then
+		-- fraction (0-1) scaled by the satisfaction scale
+		value = math.floor(value * satisfaction_scale)
+	elseif kind == "usage" then
+		-- power/energy rate: per-tick value scaled to per-second and divided by the unit multiplier
 		local multiplier = constants.multiplier_options[multiplier_index].multiplier
 		value = math.floor(value * 60 / multiplier)
-		if value == filter.min then
-			return
-		end
+	else
+		-- capacity: absolute value divided by the unit multiplier
+		local multiplier = constants.multiplier_options[multiplier_index].multiplier
+		value = math.floor(value / multiplier)
+	end
+	-- If the filter's min is already equal to the value, we don't need to update it.
+	if value == filter.min then
+		return
 	end
 	value = math.max(value, 0)
 	value = math.min(value, 2 ^ 31 - 1)
@@ -103,9 +107,9 @@ local function on_tick(event)
 		if not (combinator and combinator.valid and sensor and sensor.valid) then
 			pairs_mod.destroy(entry)
 		elseif sensor.is_connected_to_electric_network() then
-			local network = sensor.electric_network
-			local parent = network and network.parent_network
-			set_values(entry, parent and parent.flow_last_tick, entry.multiplier_index, entry.satisfaction_index)
+			local electric_network = sensor.electric_network
+			local parent_network = electric_network and electric_network.parent_network
+			set_values(entry, parent_network and parent_network.flow_last_tick, entry.multiplier_index, entry.satisfaction_index)
 		else
 			set_values(entry, nil, entry.multiplier_index, entry.satisfaction_index)
 		end

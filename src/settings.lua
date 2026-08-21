@@ -8,4 +8,11 @@ data:extend({
 		maximum_value = 10000,
 		order = "a",
 	},
+	{
+		type = "bool-setting",
+		name = "pnc-enable-from-start",
+		setting_type = "startup",
+		default_value = false,
+		order = "b",
+	}
 })

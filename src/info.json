@@ -4,7 +4,7 @@
 	"title": "Power Network Combinator",
 	"author": "Aidan647",
 	"homepage": "https://github.com/Aidan647/power-network-combinator",
-	"description": "",
+	"description": "Adds a combinator that outputs power network statistics as circuit signals.",
 	"factorio_version": "2.1",
 	"dependencies": ["base"]
 }

@@ -27,7 +27,8 @@ function pairs_mod.create(entity)
 	if entity.name ~= constants.COMBINATOR_NAME then return end
 
 	local sensor = entity.surface.create_entity {
-		name = constants.SENSOR_NAME,
+        name = constants.SENSOR_NAME,
+		--create at same position as combinator, it will not fail
 		position = entity.position,
 		force = entity.force,
 		quality = entity.quality,

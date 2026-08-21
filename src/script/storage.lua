@@ -48,6 +48,7 @@ local function ensure_tables()
 	if tables_created then return end
 	storage.combinators = storage.combinators or {}
 	storage.sensor_index = storage.sensor_index or {}
+	storage.update_list = storage.update_list or {}
 	tables_created = true
 end
 
